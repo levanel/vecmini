@@ -16,6 +16,8 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 # As we add more files (IndexIVF.cpp, etc.), we just add them to this list
 add_library(vectordb STATIC 
     src/IndexFlat.cpp
+    src/clustering.cpp
+    src/IndexIVF.cpp
 )
 
 # We will uncomment this later when we write the test script
