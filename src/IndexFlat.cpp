@@ -6,12 +6,12 @@ void IndexFlatL2::add(int n, const float *x){
 }
 
 void IndexFlatL2::search(int n, const float *x, int k, float *distances, int *labels){
-    for(int i = 0; i<n; i++){
+    for(int i = 0; i<n; i++){//iterate over the entire query
         float min_distance = 1e9;
         int bestid = -1;
-        for(int j= 0; j<ntotal; j++){
+        for(int j= 0; j<ntotal; j++){//compare query against every vec in db
             float curr_distance = 0;
-            for(int m=0; m<d; m++){
+            for(int m=0; m<d; m++){//calc distance across all d dimensions 
                 int ith_index = i*d+m;
                 int jth_index = j*d+m;
                 
