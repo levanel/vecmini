@@ -3,50 +3,53 @@
 #include <random>
 #include <chrono>
 #include "IndexFlat.h"
+#include "IndexIVF.h"
 
 int main() {
-    int d = 128;             // OpenAI-style dimensions
-    int nb = 1000000;         // 100,000 database vectors
-    int nq = 1;              // 1 query vector
+    int d = 128;
+    int nb = 100000;  // 100,000 database vectors
+    int nq = 1;       // 1 query
+    int nlist = 100;  // 100 Voronoi cell buckets
 
-    IndexFlatL2 index(d);
+    std::cout << "--- VECMINI BENCHMARK ARENA ---\n";
+    std::cout << "Dimensions: " << d << " | Vectors: " << nb << "\n\n";
 
-    // Set up the random number generator
     std::mt19937 rng(1337);
     std::uniform_real_distribution<float> dist(0.0, 1.0);
-
-    // Allocate memory for our massive arrays
     std::vector<float> database(nb * d);
     std::vector<float> query(nq * d);
-
-    std::cout << "Generating random data...\n";
-
-    // TODO 1: Write a for-loop to fill the 'database' vector with random floats
-    for(int i = 0; i<database.size(); i++){
-        database[i] = dist(rng);
-    }
-    // TODO 2: Write a for-loop to fill the 'query' vector with random floats
-    for(int i = 0; i<query.size(); i++){
-        query[i] = dist(rng);
-    }
-    std::cout << "Loading database into engine...\n";
-    index.add(nb, database.data());
+    for(int i = 0; i < nb * d; i++) database[i] = dist(rng);
+    for(int i = 0; i < nq * d; i++) query[i] = dist(rng);
 
     std::vector<float> distances(nq);
     std::vector<int> labels(nq);
-
-    std::cout << "Firing search engine...\n";
-
-    // TODO 3: Start the chrono stopwatch
-    auto start = std::chrono::high_resolution_clock::now();
-    // TODO 4: Call your index.search() function
     
-    index.search(1, query.data(), 1, distances.data(), labels.data());
+    std::cout << "FlatL2\n";
+    IndexFlatL2 flat_index(d);
+    flat_index.add(nb, database.data());
 
-    // TODO 5: Stop the chrono stopwatch
-    auto end = std::chrono::high_resolution_clock::now();
-    // TODO 6: Calculate the time taken in milliseconds and std::cout it!
-    std::chrono::duration<double, std::milli> diff=end-start;
-    std::cout<<diff.count();
+    auto start_flat = std::chrono::high_resolution_clock::now();
+    flat_index.search(nq, query.data(), 1, distances.data(), labels.data());
+    auto end_flat = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double, std::milli> diff_flat = end_flat - start_flat;
+
+    std::cout << "FlatL2 Search Time: " << diff_flat.count() << " ms\n\n";
+
+    std::cout << "Training & Loading IVF\n";
+    std::cout << "(Please wait, K-Means is drawing the map...)\n";
+    IndexIVF ivf_index(d, nlist);
+    ivf_index.train(nb, database.data()); // Train the map
+    ivf_index.add(nb, database.data());   //File the data into drawers
+
+    auto start_ivf = std::chrono::high_resolution_clock::now();
+    ivf_index.search(nq, query.data(), 1, distances.data(), labels.data());
+    auto end_ivf = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double, std::milli> diff_ivf = end_ivf - start_ivf;
+
+    std::cout << "IVF Search Time:    " << diff_ivf.count() << " ms\n\n";
+
+    float speedup = diff_flat.count() / diff_ivf.count();
+    std::cout << ">>>IVF is " << speedup << "x faster<<<\n";
+
     return 0;
 }
