@@ -7,11 +7,9 @@ class IndexFlatL2{
 
     public:
         IndexFlatL2(int d) : d(d) {}
+        // ingests 'n'vectors from a raw memory pointer 'x' into the database
         void add(int n, const float *x);
-        //n->how many queries are we running?
-                //x->where is the query memory?
-                        //k->how many nearest neghbour we want
-                            // ans is saved in distances and labels
+        //k->how many nearest neghbour we want
+        // ans is saved in distances and labels
         void search(int n, const float *x, int k, float *distances, int* labels);
-        
 };
