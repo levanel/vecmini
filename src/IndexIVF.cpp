@@ -1,5 +1,7 @@
 #include "IndexIVF.h"
 #include "clustering.h"
+#include <queue>
+
 IndexIVF::IndexIVF(int d, int nbucket): d(d), nbucket(nbucket), router(d){
     memory.resize(nbucket);
 };
@@ -28,13 +30,38 @@ void IndexIVF::search(int n, const float* x, int k,float *distances, int *labels
     router.search(n,x,1,centroids_distance.data(), assign.data());
     for(int i = 0; i<n; i++){
         int bucketid = assign[i];
-        IndexFlatL2 localcheck(d);
-        int vector_in_memo = memory[bucketid].size()/d;
-        if(vector_in_memo==0)continue;
-        localcheck.add(vector_in_memo, memory[bucketid].data());
-        const float *spec_quer = x+(i*d);
-        float* spec_dist=distances + (i*k);
-        int* spec_lbls = labels+(i*k);
-        localcheck.search(1,spec_quer, k, spec_dist, spec_lbls);
+        int vectorinmemo = memory[bucketid].size()/d;
+        if(vectorinmemo==0)continue;
+        const float *specquer = x+(i*d);
+        const float *bucketdata=  memory[bucketid].data();
+        
+        std::priority_queue<std::pair<float, int>, std::vector<std::pair<float, int>>, std::greater<std::pair<float, int>>> pq;
+        for(int j = 0; j<vectorinmemo; j++){
+            float currcosine = 0;
+            for(int m = 0; m<d; m++){
+                currcosine+=(bucketdata[j*d+m]*specquer[m]);
+            }
+
+            if(pq.size()<k){
+                pq.push({currcosine, j});
+            }else{
+                if(currcosine>pq.top().first){
+                    pq.pop();
+                    pq.push({currcosine, j});
+                }
+            }
+        }
+        float *speldist = distances+(i*k);
+        int *spelbs = labels+(i*k);
+        int count = pq.size();
+        for(int c = count-1; c>=0; c--){
+            speldist[c]= pq.top().first;
+            spelbs[c]= pq.top().second;
+            pq.pop(); 
+        }
+        for(int step = count; step<k; step++){
+            speldist[step]=-1.0; 
+            spelbs[step]= -1;
+        }
     }
 }

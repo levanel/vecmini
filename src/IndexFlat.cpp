@@ -11,7 +11,6 @@ void IndexFlatL2::search(int n, const float *x, int k, float *distances, int *la
         //old stuff
             //float min_distance = 1e9;
             //int bestid = -1;
-
         std::priority_queue<std::pair<float, int>> pq;
 
         for(int j= 0; j<ntotal; j++){//compare query against every vec in db
@@ -19,10 +18,8 @@ void IndexFlatL2::search(int n, const float *x, int k, float *distances, int *la
             for(int m=0; m<d; m++){//calc distance across all d dimensions 
                 int ith_index = i*d+m;
                 int jth_index = j*d+m;
-                
-                float diff=xb[jth_index]-x[ith_index];
-                curr_distance+=(diff*diff);
-
+                float dist = xb[jth_index] - x[ith_index];
+                curr_distance+=dist*dist; 
             }
             /*
             if (curr_distance<min_distance){
