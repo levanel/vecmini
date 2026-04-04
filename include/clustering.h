@@ -7,4 +7,4 @@ void kmean_clustering(
     int k,
     const float *x,
     float *centroids
-);
+);  

@@ -1,9 +1,11 @@
 #pragma once
 #include <vector>
+#include "AlignedAllocator.h"
+
 class IndexFlatL2{
     int d;//dimension of vector
     int ntotal=0;//no of vector in the db                   
-    std::vector<float>xb;
+    AlignedVector32<float>xb;
 
     public:
         IndexFlatL2(int d) : d(d) {}
