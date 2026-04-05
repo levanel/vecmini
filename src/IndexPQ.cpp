@@ -2,7 +2,8 @@
 #include <vector>
 #include "clustering.h"
 #include<immintrin.h>
-
+#include <random>
+#include <cstring>
 IndexPQ::IndexPQ(int d, int m):d(d), m(m){
     k_sub = 256;
     d_sub = d/m;
@@ -20,11 +21,48 @@ void IndexPQ::train(int n, const float *x){
                 dest_id[j]= source_id[j];
             }
         }
+
+
+            int maxtrain = 100000;
+    if(n>maxtrain){
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<int>dis(0,n-1);
+        std::vector<float> sample_buffer(maxtrain * d_sub);
+        for(int p=0; p<maxtrain; p++){
+            int randval = dis(gen);
+
+            std::memcpy(&sample_buffer[p*d_sub],
+                         &train_data[randval*d_sub],
+                         d_sub*sizeof(float));
+        }
+        kmean_clustering(d_sub, maxtrain, k_sub, sample_buffer.data(), centroids.data()+(i*d_sub*k_sub));
+    }else{    
         kmean_clustering(d_sub, n, k_sub, train_data.data() , centroids.data()+(i*d_sub*k_sub));
+        }
+
     }    
     trained=true;
 }
+/*
+    int maxtrain = 100000;
+    if(n>maxtrain){
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_real_distribution<int>dis(0,n-1);
+        std::vector<float> sample_buffer(maxtrain * d_sub);
+        for(int p=0; p<maxtrain; p++){
+            int randval = dis(gen);
 
+            std::memcpy(&sample_buffer[i*d_sub],
+                         &train_data[randval*d_sub],
+                         d_sub*sizeof(float));
+        }
+        kmean_clustering(d_sub, maxtrain, k_sub, sample_buffer.data(), centroids.data()+(i*d_sub*k_sub));
+    }else{    
+        kmean_clustering(d_sub, n, k_sub, train_data.data() , centroids.data()+(i*d_sub*k_sub));
+        }
+        */
 void IndexPQ::encode(const float *x, uint8_t* out){
     if(!trained)return;
     for(int i =0; i<m; i++){

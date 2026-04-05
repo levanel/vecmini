@@ -3,9 +3,9 @@
 #include "clustering.h"
 #include <queue>
 #include <iostream>
-#include<immintrin.h>
-
-
+#include <immintrin.h>
+#include <random>
+#include <cstring>
 IndexIVFPQ::IndexIVFPQ(int d, int nbucket, int m): d(d), m(m), nbucket(nbucket), router(d), pq(d, m){
     codes.resize(nbucket);
     ids.resize(nbucket);
@@ -14,7 +14,23 @@ IndexIVFPQ::IndexIVFPQ(int d, int nbucket, int m): d(d), m(m), nbucket(nbucket),
 void IndexIVFPQ::train(int n, const float *x){
     if(trained)return;
     coarse_centroids.resize(nbucket*d);
-    kmean_clustering(d, n, nbucket, x, coarse_centroids.data());
+    
+    int maxtrain = 100000;
+    if(n>maxtrain){
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<int>dis(0,n-1);
+        std::vector<float> sample_buffer(maxtrain * d);
+        for(int i=0; i<maxtrain; i++){
+            int randval = dis(gen);
+
+            std::memcpy(&sample_buffer[i*d],
+                         &x[randval*d],
+                         d*sizeof(float));
+        }
+        kmean_clustering(d, maxtrain, nbucket, sample_buffer.data(), coarse_centroids.data());
+    }else{kmean_clustering(d, n, nbucket, x, coarse_centroids.data());}    
+
     router.add(nbucket, coarse_centroids.data());
     std::vector<float>residuals(n*d);
     std::vector<float> distances(n);
@@ -74,7 +90,7 @@ void IndexIVFPQ::search(int n, const float *query, int k, int nprobe, float* dis
             std::vector<float> distance_table(m*256);
             pq.compute_distance_table(query_residual.data(), distance_table.data());
             for(int v = 0; v<codes[drawerid].size()/m; v++){
-                float totaldistance =0;
+                float totaldistance =0.0;
                 for(int m_idx = 0; m_idx<m; m_idx++){
                     int centroid_id = codes[drawerid][(v*m)+m_idx];
                     totaldistance+=distance_table[centroid_id+(m_idx*256)];

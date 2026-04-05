@@ -87,7 +87,12 @@ int main() {
     std::cout << "\nInitializing IVFPQ Engine...\n";
     IndexIVFPQ ivfpq(d, nlist, m);
     
+    auto starttrain = std::chrono::high_resolution_clock::now();
     ivfpq.train(nb, database.data());
+    auto endtrain = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double, std::milli> difftrain = endtrain - starttrain;
+    std::cout <<" time train : "<< difftrain.count() << " ms \n";
+
     std::cout << "Populating IVFPQ Memory Drawers...\n";
     ivfpq.add(nb, database.data(), database_ids.data());
 

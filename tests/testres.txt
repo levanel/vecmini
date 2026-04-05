@@ -1,0 +1,234 @@
+this one for without anything
+
+ time train : 230195 ms (230.195 sec)
+Populating IVFPQ Memory Drawers...
+Expected Centroids size: 262144
+Actual Centroids size: 262144
+Codes vector size: 2048
+
+--- RECALL VS LATENCY BENCHMARK ---
+nprobe | Latency (ms) | Recall@100
+-----------------------------------
+1	 | 0.109793 ms 	| 19%
+2	 | 0.080668 ms 	| 27%
+4	 | 0.07997 ms 	| 34%
+8	 | 0.112027 ms 	| 41%
+16	 | 0.160777 ms 	| 46%
+32	 | 0.277205 ms 	| 46%
+64	 | 0.516905 ms 	| 48%
+128	 | 1.04415 ms 	| 49%
+256	 | 1.83148 ms 	| 49%
+512	 | 3.45385 ms 	| 49%
+-----------------------------------
+aagrimrautela@pop-os:~/Desktop/vecmini/
+
+this one with the subsequence in the ivfpq file
+
+
+Initializing IVFPQ Engine...
+ time train : 99193.3 (99.193 sec)ms 
+Populating IVFPQ Memory Drawers...
+Expected Centroids size: 262144
+Actual Centroids size: 262144
+Codes vector size: 2048
+
+--- RECALL VS LATENCY BENCHMARK ---
+nprobe | Latency (ms) | Recall@100
+-----------------------------------
+1	 | 0.130047 ms 	| 13%
+2	 | 0.067049 ms 	| 16%
+4	 | 0.079062 ms 	| 25%
+8	 | 0.118942 ms 	| 30%
+16	 | 0.176981 ms 	| 31%
+32	 | 0.292849 ms 	| 32%
+64	 | 0.538207 ms 	| 35%
+128	 | 0.997071 ms 	| 35%
+256	 | 1.89091 ms 	| 35%
+512	 | 3.6499 ms 	| 35%
+-----------------------------------
+aagrimrautela@pop-os:~/Desktop/vecmini/build$ 
+
+
+this ons is just subsequence in the pq file
+
+aagrimrautela@pop-os:~/Desktop/vecmini/build$ ./test_flat
+--- VECMINI SIFT1M BENCHMARK ARENA ---
+Loading SIFT1M Database...
+Loading SIFT1M Queries...
+Loaded 500000 vectors of dimension 128.
+
+Calculating Ground Truth (FlatL2)...
+
+Initializing IVFPQ Engine...
+ time train : 191921 ms 
+Populating IVFPQ Memory Drawers...
+Expected Centroids size: 262144
+Actual Centroids size: 262144
+Codes vector size: 2048
+
+--- RECALL VS LATENCY BENCHMARK ---
+nprobe | Latency (ms) | Recall@100
+-----------------------------------
+1	 | 0.123203 ms 	| 19%
+2	 | 0.085418 ms 	| 27%
+4	 | 0.078782 ms 	| 32%
+8	 | 0.109932 ms 	| 41%
+16	 | 0.165317 ms 	| 44%
+32	 | 0.271408 ms 	| 44%
+64	 | 0.51404 ms 	| 45%
+128	 | 0.924016 ms 	| 45%
+256	 | 1.79761 ms 	| 45%
+512	 | 3.53284 ms 	| 45%
+-----------------------------------
+aagrimrautela@pop-os:~/Desktop/vecmini/build$ ./test_flat
+--- VECMINI SIFT1M BENCHMARK ARENA ---
+Loading SIFT1M Database...
+Loading SIFT1M Queries...
+Loaded 500000 vectors of dimension 128.
+
+Calculating Ground Truth (FlatL2)...
+
+Initializing IVFPQ Engine...
+ time train : 187396 ms 
+Populating IVFPQ Memory Drawers...
+Expected Centroids size: 262144
+Actual Centroids size: 262144
+Codes vector size: 2048
+
+--- RECALL VS LATENCY BENCHMARK ---
+nprobe | Latency (ms) | Recall@100
+-----------------------------------
+1	 | 0.132771 ms 	| 19%
+2	 | 0.064814 ms 	| 26%
+4	 | 0.08444 ms 	| 34%
+8	 | 0.107976 ms 	| 38%
+16	 | 0.156587 ms 	| 43%
+32	 | 0.266729 ms 	| 42%
+64	 | 0.488758 ms 	| 42%
+128	 | 0.91801 ms 	| 43%
+256	 | 1.76422 ms 	| 43%
+512	 | 3.44952 ms 	| 43%
+-----------------------------------
+aagrimrautela@pop-os:~/Desktop/vecmini/build$ 
+
+
+now running both ivfpq subsequence and pq subsequence
+
+
+aagrimrautela@pop-os:~/Desktop/vecmini/build$ ./test_flat
+--- VECMINI SIFT1M BENCHMARK ARENA ---
+Loading SIFT1M Database...
+Loading SIFT1M Queries...
+Loaded 500000 vectors of dimension 128.
+
+Calculating Ground Truth (FlatL2)...
+
+Initializing IVFPQ Engine...
+ time train : 58555.9 ms 
+Populating IVFPQ Memory Drawers...
+Expected Centroids size: 262144
+Actual Centroids size: 262144
+Codes vector size: 2048
+
+--- RECALL VS LATENCY BENCHMARK ---
+nprobe | Latency (ms) | Recall@100
+-----------------------------------
+1	 | 0.119152 ms 	| 4%
+2	 | 0.062509 ms 	| 7%
+4	 | 0.078503 ms 	| 22%
+8	 | 0.110979 ms 	| 29%
+16	 | 0.170695 ms 	| 36%
+32	 | 0.303396 ms 	| 38%
+64	 | 0.528498 ms 	| 38%
+128	 | 0.98415 ms 	| 38%
+256	 | 1.86912 ms 	| 38%
+512	 | 3.63677 ms 	| 38%
+-----------------------------------
+aagrimrautela@pop-os:~/Desktop/vecmini/build$ ./test_flat
+--- VECMINI SIFT1M BENCHMARK ARENA ---
+Loading SIFT1M Database...
+Loading SIFT1M Queries...
+Loaded 500000 vectors of dimension 128.
+
+Calculating Ground Truth (FlatL2)...
+
+Initializing IVFPQ Engine...
+ time train : 58630.6 ms 
+Populating IVFPQ Memory Drawers...
+Expected Centroids size: 262144
+Actual Centroids size: 262144
+Codes vector size: 2048
+
+--- RECALL VS LATENCY BENCHMARK ---
+nprobe | Latency (ms) | Recall@100
+-----------------------------------
+1	 | 0.125298 ms 	| 15%
+2	 | 0.068655 ms 	| 29%
+4	 | 0.10204 ms 	| 32%
+8	 | 0.133189 ms 	| 38%
+16	 | 0.185083 ms 	| 43%
+32	 | 0.315339 ms 	| 46%
+64	 | 0.547635 ms 	| 46%
+128	 | 0.992811 ms 	| 46%
+256	 | 1.86619 ms 	| 46%
+512	 | 3.59989 ms 	| 46%
+-----------------------------------
+aagrimrautela@pop-os:~/Desktop/vecmini/build$ ./test_flat
+--- VECMINI SIFT1M BENCHMARK ARENA ---
+Loading SIFT1M Database...
+Loading SIFT1M Queries...
+Loaded 500000 vectors of dimension 128.
+
+Calculating Ground Truth (FlatL2)...
+
+Initializing IVFPQ Engine...
+ time train : 57937.6 ms 
+Populating IVFPQ Memory Drawers...
+Expected Centroids size: 262144
+Actual Centroids size: 262144
+Codes vector size: 2048
+
+--- RECALL VS LATENCY BENCHMARK ---
+nprobe | Latency (ms) | Recall@100
+-----------------------------------
+1	 | 0.125437 ms 	| 9%
+2	 | 0.064813 ms 	| 14%
+4	 | 0.097361 ms 	| 28%
+8	 | 0.115031 ms 	| 31%
+16	 | 0.172651 ms 	| 38%
+32	 | 0.302837 ms 	| 44%
+64	 | 0.527659 ms 	| 46%
+128	 | 0.995395 ms 	| 46%
+256	 | 1.92074 ms 	| 46%
+512	 | 3.67029 ms 	| 46%
+-----------------------------------
+aagrimrautela@pop-os:~/Desktop/vecmini/build$ ./test_flat
+--- VECMINI SIFT1M BENCHMARK ARENA ---
+Loading SIFT1M Database...
+Loading SIFT1M Queries...
+Loaded 500000 vectors of dimension 128.
+
+Calculating Ground Truth (FlatL2)...
+
+Initializing IVFPQ Engine...
+ time train : 58273.3 ms 
+Populating IVFPQ Memory Drawers...
+Expected Centroids size: 262144
+Actual Centroids size: 262144
+Codes vector size: 2048
+
+--- RECALL VS LATENCY BENCHMARK ---
+nprobe | Latency (ms) | Recall@100
+-----------------------------------
+1	 | 0.121387 ms 	| 8%
+2	 | 0.082833 ms 	| 20%
+4	 | 0.081786 ms 	| 28%
+8	 | 0.110281 ms 	| 38%
+16	 | 0.17265 ms 	| 43%
+32	 | 0.294665 ms 	| 47%
+64	 | 0.532479 ms 	| 48%
+128	 | 0.975769 ms 	| 48%
+256	 | 1.94791 ms 	| 48%
+512	 | 3.65367 ms 	| 48%
+-----------------------------------
+aagrimrautela@pop-os:~/Desktop/vecmini/build$ 
