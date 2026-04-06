@@ -2,17 +2,8 @@
 
 small experiment with vector search. mostly focused on comparing brute force (FlatL2) vs IVF and trying to push latency down.
 
-## quick notes
 
-* FlatL2 = exact search, slow
-* IVF = approximate, much faster
-* currently about 2x slower than faiss in best case
-
----
-
-## benchmarks
-
-### 24/03/26
+24/03/26
 
 FlatL2 Search Time: 52.3925 ms
 IVF Search Time:    0.681871 ms
@@ -20,7 +11,7 @@ IVF is ~76.8x faster
 
 ---
 
-### 29/03/26
+29/03/26
 
 Dimensions: 128
 Vectors: 100000
@@ -32,7 +23,7 @@ IVF is ~124.9x faster
 
 ---
 
-### 02/04/26
+02/04/26
 
 IVF Search Time: 0.061043 ms
 still about 2x behind faiss
