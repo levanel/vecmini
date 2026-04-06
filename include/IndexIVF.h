@@ -2,7 +2,7 @@
 #include <vector>
 #include "IndexFlat.h"
 #include <cstdint>
-#include "AlignedAllocator.h"
+
 class IndexIVF {
 private: // The vault (Only the database can touch these)
     int d; 
@@ -11,7 +11,7 @@ private: // The vault (Only the database can touch these)
     bool trained = false;
     
     IndexFlatL2 router; 
-    std::vector<AlignedVector32<float>> memory;
+    std::vector<std::vector<float>> memory;
     std::vector<std::vector<uint64_t>> memory_ids;
 
 public: // The interface (Your benchmark script is allowed to use these)

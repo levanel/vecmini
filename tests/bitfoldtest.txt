@@ -1,0 +1,60 @@
+5 test method
+
+without the bitfold:
+
+
+running ts
+Memory alignment check: 16
+nullptr: 0.791734
+bitmask: 0.293268
+
+Memory alignment check: 16
+nullptr: 0.524936   
+bitmask: 0.273503
+
+running ts
+Memory alignment check: 16
+nullptr: 0.516066
+bitmask: 0.274201
+
+running ts
+Memory alignment check: 16
+nullptr: 0.521653
+bitmask: 0.37687
+
+running ts
+Memory alignment check: 16
+nullptr: 0.517044
+bitmask: 0.308215
+
+with bitfold
+
+aagrimrautela@pop-os:~/Desktop/vecmini/build$ ./metadatatest
+running ts
+Memory alignment check: 16
+nullptr: 0.526263
+bitmask: 0.396635
+aagrimrautela@pop-os:~/Desktop/vecmini/build$ 
+
+
+running ts
+Memory alignment check: 16
+nullptr: 0.436237
+bitmask: 0.285028
+
+running ts
+Memory alignment check: 16
+nullptr: 0.471436
+bitmask: 0.32351
+
+running ts
+Memory alignment check: 16
+nullptr: 0.449367
+bitmask: 0.280417
+
+running ts
+Memory alignment check: 16
+nullptr: 0.64262
+bitmask: 0.308285
+
+

@@ -11,12 +11,12 @@ IndexIVFPQ::IndexIVFPQ(int d, int nbucket, int m): d(d), m(m), nbucket(nbucket),
     ids.resize(nbucket);
 };
 
-void IndexIVFPQ::train(int n, const float *x){
+void IndexIVFPQ::train(int n, const float *x, bool subsampling){
     if(trained)return;
     coarse_centroids.resize(nbucket*d);
     
     int maxtrain = 100000;
-    if(n>maxtrain){
+    if(n>maxtrain && subsampling){
         std::random_device rd;
         std::mt19937 gen(rd());
         std::uniform_int_distribution<int>dis(0,n-1);
@@ -42,7 +42,7 @@ void IndexIVFPQ::train(int n, const float *x){
             residuals[(i*d)+j] = x[(i*d)+j] - coarse_centroids[(drawerid*d)+j];  
         }
     }
-    pq.train(n, residuals.data());
+    pq.train(n, residuals.data(), subsampling);
     trained = true;
 }
 void IndexIVFPQ::add(int n, const float *x, const uint64_t* xids){

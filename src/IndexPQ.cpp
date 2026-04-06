@@ -10,7 +10,7 @@ IndexPQ::IndexPQ(int d, int m):d(d), m(m){
     centroids.resize(m*d_sub*k_sub);
 }; 
 
-void IndexPQ::train(int n, const float *x){
+void IndexPQ::train(int n, const float *x, bool subsampling){
     if(trained) return;
     std::vector<float>train_data(n*d_sub);
     for(int i=0 ; i<m; i++){
@@ -23,8 +23,8 @@ void IndexPQ::train(int n, const float *x){
         }
 
 
-            int maxtrain = 100000;
-    if(n>maxtrain){
+    int maxtrain = 100000;
+    if(n>maxtrain && subsampling){
         std::random_device rd;
         std::mt19937 gen(rd());
         std::uniform_int_distribution<int>dis(0,n-1);

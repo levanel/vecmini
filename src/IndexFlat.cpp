@@ -25,18 +25,24 @@ void IndexFlatL2::search(int n, const float *x, int k, float *distances, int *la
             const float* current_q_vec = &x[i * d];
 
             for(; m + 7 < d; m += 8){
-                __m256 dbvec = _mm256_load_ps(&current_db_vec[m]);
-                __m256 qvec = _mm256_load_ps(&current_q_vec[m]);
+                __m256 dbvec = _mm256_loadu_ps(&current_db_vec[m]);
+                __m256 qvec = _mm256_loadu_ps(&current_q_vec[m]);
                 
                 __m256 diff = _mm256_sub_ps(dbvec, qvec);
                 
                 sumvec = _mm256_fmadd_ps(diff, diff, sumvec);
             }
+
             
-            float sumarr[8];
-            _mm256_storeu_ps(sumarr, sumvec);
-            curr_distance = sumarr[0] + sumarr[1] + sumarr[2] + sumarr[3] + 
-                            sumarr[4] + sumarr[5] + sumarr[6] + sumarr[7];
+            __m128 upper = _mm256_extractf128_ps(sumvec,1);
+            __m128 lower = _mm256_castps256_ps128(sumvec); 
+            
+            __m128 sumbound = _mm_add_ps(upper, lower);
+            __m128 shifted = _mm_movehl_ps(sumbound,sumbound);
+            __m128 current = _mm_add_ps(sumbound, shifted);
+            __m128 shuffled = _mm_shuffle_ps(current, current, 1);
+            __m128 finalsum = _mm_add_ps(current, shuffled);
+            curr_distance = _mm_cvtss_f32(finalsum);
             
             for(; m < d; m++){
                 float dist = current_db_vec[m] - current_q_vec[m];

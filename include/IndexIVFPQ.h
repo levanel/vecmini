@@ -3,7 +3,7 @@
 #include<cstdint>
 #include "IndexPQ.h"
 #include "IndexFlat.h"
-
+#include <cstddef>
 class IndexIVFPQ{
 private:
     int d;
@@ -20,7 +20,7 @@ private:
 
 public: 
     IndexIVFPQ(int d, int nbucket, int m);
-    void train(int n, const float *x);
+    void train(int n, const float *x, bool subsampling);
     void add(int n, const float *x, const uint64_t* xids);
     void search(int n, const float *query, int k, int nprobe, float* distances, int64_t* labels);
 };

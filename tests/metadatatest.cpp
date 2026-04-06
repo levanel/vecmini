@@ -3,7 +3,6 @@
 #include <random>
 #include <chrono>
 #include "IndexIVF.h"
-#include "AlignedAllocator.h"
 
 int main(){
     int d = 128;
@@ -15,8 +14,8 @@ int main(){
 
     std::mt19937 rng(1337);
     std::uniform_real_distribution<float>dist(0.0, 1.0);
-    AlignedVector32<float>db_v(nb*d);
-    AlignedVector32<float>q_v(nq*d);
+    std::vector<float>db_v(nb*d);
+    std::vector<float>q_v(nq*d);
     std::vector<uint64_t>db_id(nb);
     for(int i =0; i<nb; i++){
         db_id[i]=i;
@@ -48,6 +47,7 @@ int main(){
     ivf.search(nq, q_v.data(), 5, nprobe, bitmask.data() , distances.data(), assignids.data());
     auto end2 = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double, std::milli> time2 = end2 - start2;
+    std::cout << "Memory alignment check: " << ((uintptr_t)db_v.data() % 32) << std::endl;
     std::cout<<"nullptr: "<< time1.count()<<"\n";
     std::cout<<"bitmask: "<< time2.count()<<"\n";
     return 0;
