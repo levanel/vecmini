@@ -4,35 +4,25 @@
 #include <unordered_set>
 #include <fstream>
 
-// Include your vecmini headers
 #include "IndexFlat.h"
 #include "IndexIVF.h"
 #include "IndexIVFPQ.h"
 
-// --- THE FVECS PARSER ---
-// Reads Meta's standard binary vector format directly into RAM
 bool read_fvecs(const char* fname, std::vector<float>& data, int& num_vectors, int& dim) {
     std::ifstream file(fname, std::ios::binary);
     if (!file) {
         std::cerr << "Error: Could not open " << fname << "\n";
         return false;
     }
-
-    // Read the dimension of the first vector
     file.read((char*)&dim, sizeof(int));
-    
-    // Find file size to calculate total vectors
     file.seekg(0, std::ios::end);
     size_t file_size = file.tellg();
     file.seekg(0, std::ios::beg);
-
-    // Each vector is 1 int (dimension) + 'dim' floats
     size_t bytes_per_vector = sizeof(int) + dim * sizeof(float);
     num_vectors = file_size / bytes_per_vector;
 
     data.resize(num_vectors * dim);
 
-    // Read the binary stream into our 1D array
     for (int i = 0; i < num_vectors; i++) {
         int d;
         file.read((char*)&d, sizeof(int)); // Read dimension
@@ -46,7 +36,6 @@ bool read_fvecs(const char* fname, std::vector<float>& data, int& num_vectors, i
 int main() {
     std::cout << "--- VECMINI SIFT1M BENCHMARK ARENA ---\n";
 
-    // --- 1. LOAD REAL DATA ---
     std::vector<float> database;
     std::vector<float> queries;
     int nb, nq, d, d_query;
@@ -60,7 +49,6 @@ int main() {
 
     std::cout << "Loaded " << nb << " vectors of dimension " << d << ".\n\n";
 
-    // --- 2. CONFIGURATION ---
     int query_idx = 0; // We'll test the very first query in the file
     int k = 100;       // Top 100 results for Recall
     int nlist = 2048;  // 2048 Voronoi buckets
@@ -69,10 +57,7 @@ int main() {
     std::vector<uint64_t> database_ids(nb);
     for(int i = 0; i < nb; i++) database_ids[i] = i; 
 
-    // Extract exactly 1 query (128 floats)
     const float* single_query = queries.data() + (query_idx * d);
-
-    // --- 3. GET THE GROUND TRUTH (FlatL2) ---
     std::cout << "Calculating Ground Truth (FlatL2)..." << std::endl;
     IndexFlatL2 flat(d);
     flat.add(nb, database.data());
@@ -82,8 +67,6 @@ int main() {
     flat.search(1, single_query, k, true_dists.data(), true_labels.data());
 
     std::unordered_set<int> ground_truth_set(true_labels.begin(), true_labels.end());
-
-    // --- 4. SETUP IVFPQ ---
     std::cout << "\nInitializing IVFPQ Engine...\n";
     IndexIVFPQ ivfpq(d, nlist, m);
     bool subsequence = false;
@@ -96,7 +79,6 @@ int main() {
     std::cout << "Populating IVFPQ Memory Drawers...\n";
     ivfpq.add(nb, database.data(), database_ids.data());
 
-    // --- 5. SWEEP NPROBE AND CALCULATE RECALL ---
     std::vector<int> nprobe_values = {1, 2, 4, 8, 16, 32, 64, 128, 256, 512};
     
     std::vector<float> test_dists(k);
