@@ -11,25 +11,23 @@ IndexIVFPQ::IndexIVFPQ(int d, int nbucket, int m): d(d), m(m), nbucket(nbucket),
     ids.resize(nbucket);
 };
 
-void IndexIVFPQ::train(int n, const float *x, bool subsampling){
+void IndexIVFPQ::train(int n, const float *x, bool subsampling, int seed){
     if(trained)return;
     coarse_centroids.resize(nbucket*d);
     
-    int maxtrain = 100000;
+    int maxtrain = 150000;
     if(n>maxtrain && subsampling){
-        std::random_device rd;
-        std::mt19937 gen(rd());
+        std::mt19937 gen(seed);
         std::uniform_int_distribution<int>dis(0,n-1);
         std::vector<float> sample_buffer(maxtrain * d);
         for(int i=0; i<maxtrain; i++){
             int randval = dis(gen);
-
             std::memcpy(&sample_buffer[i*d],
-                         &x[randval*d],
-                         d*sizeof(float));
+                         &x[randval * d],
+                         d * sizeof(float));
         }
-        kmean_clustering(d, maxtrain, nbucket, sample_buffer.data(), coarse_centroids.data());
-    }else{kmean_clustering(d, n, nbucket, x, coarse_centroids.data());}    
+        kmean_clustering(d, maxtrain, nbucket, sample_buffer.data(), coarse_centroids.data(), seed);
+    }else{kmean_clustering(d, n, nbucket, x, coarse_centroids.data(), seed);}    
 
     router.add(nbucket, coarse_centroids.data());
     std::vector<float>residuals(n*d);
@@ -42,7 +40,7 @@ void IndexIVFPQ::train(int n, const float *x, bool subsampling){
             residuals[(i*d)+j] = x[(i*d)+j] - coarse_centroids[(drawerid*d)+j];  
         }
     }
-    pq.train(n, residuals.data(), subsampling);
+    pq.train(n, residuals.data(), subsampling, seed);
     trained = true;
 }
 void IndexIVFPQ::add(int n, const float *x, const uint64_t* xids){
@@ -51,9 +49,9 @@ void IndexIVFPQ::add(int n, const float *x, const uint64_t* xids){
     std::vector<float> distances(n);
     std::vector<int> labels(n);
     router.search(n,x,1,distances.data(), labels.data());
-    std::cout << "Expected Centroids size: " << nbucket * d << std::endl;
-std::cout << "Actual Centroids size: " << coarse_centroids.size() << std::endl;
-std::cout << "Codes vector size: " << codes.size() << std::endl;   
+    std::cout << "expected centroids size: " << nbucket * d << std::endl;
+std::cout << "actual centroids size: " << coarse_centroids.size() << std::endl;
+std::cout << "codes vector size: " << codes.size() << std::endl;   
     for(int i = 0;i<n; i++){
         int drawerid = labels[i];
         for(int j = 0; j<d; j++){
@@ -85,7 +83,7 @@ void IndexIVFPQ::search(int n, const float *query, int k, int nprobe, float* dis
                 __m256 diffvec = _mm256_sub_ps(qrvec,ccvec);
                 _mm256_storeu_ps(&query_residual[j], diffvec);
             }   
-
+            
 
             std::vector<float> distance_table(m*256);
             pq.compute_distance_table(query_residual.data(), distance_table.data());

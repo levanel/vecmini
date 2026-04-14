@@ -4,7 +4,7 @@
 #include <cstdint>
 
 class IndexIVF {
-private: // The vault (Only the database can touch these)
+private: 
     int d; 
     int nbucket; 
     int ntotal = 0;

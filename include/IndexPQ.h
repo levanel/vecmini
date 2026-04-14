@@ -12,7 +12,7 @@ private:
     bool trained  = false;
 public: 
     IndexPQ(int d, int m);
-    void train(int n, const float* x, bool subsampling);
+    void train(int n, const float* x, bool subsampling, int seed);
     void encode(const float *x, uint8_t* out);
     void compute_distance_table(const float *query, float *outable);
 };

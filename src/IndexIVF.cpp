@@ -11,7 +11,9 @@ IndexIVF::IndexIVF(int d, int nbucket): d(d), nbucket(nbucket), router(d){
 void IndexIVF::train(int n, const float *x){
      if(trained) return;
      std::vector<float>centroids(nbucket*d);
-     kmean_clustering(d, n, nbucket, x ,centroids.data());
+
+     //remove seed
+     kmean_clustering(d, n, nbucket, x ,centroids.data(),1);
      router.add(nbucket, centroids.data());
      trained=true;
 }
@@ -54,7 +56,7 @@ void IndexIVF::search(int n, const float* x, int k, int nprobe, const uint8_t *b
                 continue;
             }
             set.insert(global_id);
-*/
+*/  
             if(bitmask!=nullptr && bitmask[global_id]==0) {
                 continue;
             }
@@ -87,6 +89,17 @@ void IndexIVF::search(int n, const float* x, int k, int nprobe, const uint8_t *b
                 sumvec = _mm256_fmadd_ps(dbvec, qvec, sumvec);
             }
             
+            __m128 upper = _mm256_extractf128_ps(sumvec, 1);
+            __m128 lower = _mm256_extractf128_ps(sumvec, 0);
+
+            __m128 sumbound = _mm_add_ps(upper, lower);
+            __m128 shifted = _mm_movehl_ps(sumbound, sumbound);
+            __m128 current = _mm_add_ps(sumbound, shifted);
+            __m128 shuffled = _mm_shuffle_ps(current, current, 1);
+            __m128 finalsum = _mm_add_ps(current, shuffled);
+            currcosine = _mm_cvtss_f32(finalsum);
+
+/*
             float sumarr[8];
             _mm256_storeu_ps(sumarr,sumvec);
             currcosine= sumarr[0]+sumarr[1]+
@@ -94,6 +107,7 @@ void IndexIVF::search(int n, const float* x, int k, int nprobe, const uint8_t *b
                         sumarr[4]+sumarr[5]+
                         sumarr[6]+sumarr[7];
             //cleanup       
+  */
             if(pq.size()<k){
                 pq.push({currcosine, global_id});
             }else{

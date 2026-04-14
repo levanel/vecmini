@@ -1,8 +1,10 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h> 
 #include "IndexIVF.h"
+#include "IndexIVFPQ.h"
 #include "iostream"
-
+#include <pybind11/stl.h>
+#include <vector>
 namespace py = pybind11;
 
 // "vecmini" is the name of the module you will type in python-> 'import vecmini'
@@ -10,16 +12,14 @@ PYBIND11_MODULE(vecmini, m) {
     m.doc() = "Vecmini: A mini custom IVF Vector Database with Metadata Filtering";
 
     py::class_<IndexIVF>(m, "IndexIVF")
-        // Expose the constructor
         .def(py::init<int, int>(), py::arg("d"), py::arg("nbucket"))
         
-        // Expose train() - Unchanged
-        .def("train", [](IndexIVF &self, int n, py::array_t<float, py::array::c_style | py::array::forcecast> x) {
+        .def("train", [](IndexIVF &self, int n, py::array_t<float, py::array::c_style> x) {
             py::buffer_info buf = x.request();
             self.train(n, (const float *)buf.ptr);
-        }, py::arg("n"), py::arg("x"))
+        }, py::arg("n"), py::arg("x").noconvert())
         
-        // Expose add() - UPDATED FOR PARALLEL ARRAYS (xids)
+
         .def("add", [](IndexIVF &self, int n, 
                        py::array_t<float, py::array::c_style | py::array::forcecast> x, 
                        py::array_t<uint64_t, py::array::c_style | py::array::forcecast> xids) {
@@ -29,7 +29,7 @@ PYBIND11_MODULE(vecmini, m) {
             
             self.add(n, (const float *)buf_x.ptr, (const uint64_t *)buf_xids.ptr);
         }, py::arg("n"), py::arg("x"), py::arg("xids"))
-        
+
         // Expose search() - UPDATED FOR NPROBE AND BITMASK
         .def("search", [](IndexIVF &self, int n, 
                           py::array_t<float, py::array::c_style | py::array::forcecast> x, 
@@ -52,10 +52,41 @@ PYBIND11_MODULE(vecmini, m) {
                 std::cout<<"recieved NONE\n";
             }
             
-            // THE FIX: Use mutable_data() directly!
+
             self.search(n, (const float *)buf_x.ptr, k, nprobe, bitmask_ptr, 
                         distances.mutable_data(), labels.mutable_data());
             
             return py::make_tuple(distances, labels);
         }, py::arg("n"), py::arg("x"), py::arg("k"), py::arg("nprobe"), py::arg("bitmask"));
+
+    py::class_<IndexIVFPQ>(m, "IndexIVFPQ")
+        .def(py::init<int, int, int>(),
+        py::arg("d"),
+        py::arg("nbucket"),
+        py::arg("m"))
+
+        .def("train", [](IndexIVFPQ &self, int n, py::array_t<float, py::array::c_style> x, bool subsampling, bool seed) {
+            py::buffer_info buf = x.request();
+            self.train(n, static_cast<const float *>(buf.ptr), subsampling, seed);
+        }, py::arg("n"), py::arg("x").noconvert(), py::arg("subsampling"), py::arg("seed"))
+
+        .def("add", [](IndexIVFPQ &self,int n, py::array_t<float, py::array::c_style> x, py::array_t<uint64_t, py::array::c_style> xids){
+            py::buffer_info bufx = x.request();
+            py::buffer_info bufxids = xids.request();
+
+            self.add(n, static_cast<const float *>(bufx.ptr),static_cast<const uint64_t *>(bufxids.ptr));
+        }, py::arg("n"), py::arg("x").noconvert(), py::arg("xids").noconvert())
+
+        .def("search", [](IndexIVFPQ &self, int n, 
+                        py::array_t<float, py::array::c_style> query, 
+                        int k, int nprobe){
+            py::buffer_info buf_query = query.request();
+            
+            py::array_t<float> distances({n,k});
+            py::array_t<int64_t> labels({n,k});
+            
+            self.search(n, static_cast<const float *>(buf_query.ptr), k, nprobe, distances.mutable_data(), labels.mutable_data());
+
+            return py::make_tuple(distances, labels);
+        }, py::arg("n"), py::arg("query").noconvert(), py::arg("k"), py::arg("nprobe"));
 }

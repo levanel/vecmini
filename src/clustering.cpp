@@ -1,11 +1,19 @@
 #include<vector>
 #include "clustering.h" 
 #include "IndexFlat.h"
-void kmean_clustering(int d, int n, int k, const float *x, float *centroids){
-    for(int i = 0; i<k*d; i++){
-        centroids[i]=x[i];
+#include <random>
+#include <cstring>
+#include <cmath>
+void kmean_clustering(int d, int n, int k, const float *x, float *centroids, int seed){
+    std::mt19937 gen(seed);    
+    std::uniform_int_distribution<int> distr(0, n - 1); 
+    
+    for (int i = 0; i < k; i++) {
+        int rand_idx = distr(gen);
+        std::memcpy(centroids + (i * d), x + (rand_idx * d), d * sizeof(float));
     }
-    int niter = 10;
+
+    int niter = 15;
     std::vector<int> assign(n);
     std::vector<float> distances(n);
     for(int iter = 0; iter<niter; iter++){

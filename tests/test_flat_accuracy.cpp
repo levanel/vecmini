@@ -42,7 +42,7 @@ int main() {
 
     std::cout << "Loading SIFT1M Database...\n";
     if (!read_fvecs("../data/sift/sift_base.fvecs", database, nb, d)) return -1;
-    nb = 500000;
+//    nb = 500000;
     database.resize(nb * d);
     std::cout << "Loading SIFT1M Queries...\n";
     if (!read_fvecs("../data/sift/sift_query.fvecs", queries, nq, d_query)) return -1;
@@ -71,7 +71,7 @@ int main() {
     IndexIVFPQ ivfpq(d, nlist, m);
     bool subsequence = false;
     auto starttrain = std::chrono::high_resolution_clock::now();
-    ivfpq.train(nb, database.data(), subsequence);
+    ivfpq.train(nb, database.data(), subsequence, 32);
     auto endtrain = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double, std::milli> difftrain = endtrain - starttrain;
     std::cout <<" time train : "<< difftrain.count() << " ms \n";

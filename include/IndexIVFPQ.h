@@ -10,7 +10,7 @@ private:
     int m;//bitquant 
     int nbucket; //no of centroid
     int ntotal; //no of vector index
-    bool trained;
+    bool trained=false;
     size_t nprobe;//how many voronoi i should look at
     IndexFlatL2 router;
     IndexPQ pq;
@@ -20,7 +20,7 @@ private:
 
 public: 
     IndexIVFPQ(int d, int nbucket, int m);
-    void train(int n, const float *x, bool subsampling);
+    void train(int n, const float *x, bool subsampling, int seed);
     void add(int n, const float *x, const uint64_t* xids);
     void search(int n, const float *query, int k, int nprobe, float* distances, int64_t* labels);
 };

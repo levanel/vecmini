@@ -6,5 +6,6 @@ void kmean_clustering(
     int n,
     int k,
     const float *x,
-    float *centroids
+    float *centroids,
+    int seed
 );  
