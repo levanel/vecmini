@@ -24,15 +24,10 @@ ground_truth_set = set(np.argsort(exact_dists)[:k])
 
 base_ids = np.arange(nb, dtype=np.uint64)
 
-# Tracking the winner
 best_seed = -1
 max_matches = -1
 print(f"\nHunting for the best K-Means seed (Testing 1-10)...")
 
-# Only test 10 to start. 
-    
-    # CRITICAL: Re-initialize the DB inside the loop!
-    # This forces C++ to allocate fresh memory and destroys the old arrays.
 for seed in range(1, 16): 
 
     db = vecmini.IndexIVFPQ(d, nlist, m)
