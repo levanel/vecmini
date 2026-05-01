@@ -1,3 +1,4 @@
+![Pareto Chart](gistpareto.png)
 # vecmini
 
 small experiment with vector search. mostly focused on comparing brute force (FlatL2) vs IVF and trying to push latency down.
@@ -69,3 +70,4 @@ nprobe | latency (ms) | recall@100
 ---
 
 We doin gooood
+
